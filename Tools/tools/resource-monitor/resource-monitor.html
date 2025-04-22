@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Monitor & System Analytics</title>
+    <link rel="stylesheet" href="../../css/tools/resource-monitor.css">
+</head>
+<body>
+    <div class="resource-monitor-layout">
+        <!-- Top Navigation Bar -->
+        <nav class="top-nav">
+            <div class="nav-left">
+                <button id="menuToggle" class="icon-button">☰</button>
+                <div class="monitor-controls">
+                    <button id="startMonitoringBtn" class="action-button">
+                        <span class="icon">▶️</span> Start
+                    </button>
+                    <button id="pauseMonitoringBtn" class="action-button" disabled>
+                        <span class="icon">⏸️</span> Pause
+                    </button>
+                    <select id="updateInterval">
+                        <option value="1000">1 second</option>
+                        <option value="5000">5 seconds</option>
+                        <option value="10000">10 seconds</option>
+                        <option value="30000">30 seconds</option>
+                    </select>
+                </div>
+            </div>
+            <div class="nav-center">
+                <div class="system-info">
+                    <span class="info-item">
+                        <span class="icon">💻</span>
+                        <span id="systemName">System Name</span>
+                    </span>
+                    <span class="info-item">
+                        <span class="icon">⚡</span>
+                        <span id="uptime">Uptime: 0:00:00</span>
+                    </span>
+                </div>
+            </div>
+            <div class="nav-right">
+                <button id="exportDataBtn" class="action-button">
+                    <span class="icon">📤</span> Export
+                </button>
+                <button id="settingsBtn" class="icon-button">⚙️</button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div class="main-container">
+            <!-- Resource Overview Cards -->
+            <div class="resource-overview">
+                <!-- CPU Usage Card -->
+                <div class="resource-card" id="cpuCard">
+                    <div class="card-header">
+                        <h3>CPU Usage</h3>
+                        <span class="usage-value">0%</span>
+                    </div>
+                    <div class="usage-graph">
+                        <canvas id="cpuGraph"></canvas>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-item">
+                            <span class="label">Cores:</span>
+                            <span class="value" id="cpuCores">0</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Clock Speed:</span>
+                            <span class="value" id="cpuSpeed">0 GHz</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Temperature:</span>
+                            <span class="value" id="cpuTemp">0°C</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Memory Usage Card -->
+                <div class="resource-card" id="memoryCard">
+                    <div class="card-header">
+                        <h3>Memory Usage</h3>
+                        <span class="usage-value">0%</span>
+                    </div>
+                    <div class="usage-graph">
+                        <canvas id="memoryGraph"></canvas>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-item">
+                            <span class="label">Total:</span>
+                            <span class="value" id="totalMemory">0 GB</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Used:</span>
+                            <span class="value" id="usedMemory">0 GB</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Free:</span>
+                            <span class="value" id="freeMemory">0 GB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disk Usage Card -->
+                <div class="resource-card" id="diskCard">
+                    <div class="card-header">
+                        <h3>Disk Usage</h3>
+                        <span class="usage-value">0%</span>
+                    </div>
+                    <div class="usage-graph">
+                        <canvas id="diskGraph"></canvas>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-item">
+                            <span class="label">Total:</span>
+                            <span class="value" id="totalDisk">0 GB</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Used:</span>
+                            <span class="value" id="usedDisk">0 GB</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Free:</span>
+                            <span class="value" id="freeDisk">0 GB</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Network Usage Card -->
+                <div class="resource-card" id="networkCard">
+                    <div class="card-header">
+                        <h3>Network Usage</h3>
+                        <div class="network-stats">
+                            <span class="upload">↑ 0 KB/s</span>
+                            <span class="download">↓ 0 KB/s</span>
+                        </div>
+                    </div>
+                    <div class="usage-graph">
+                        <canvas id="networkGraph"></canvas>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-item">
+                            <span class="label">Interface:</span>
+                            <span class="value" id="networkInterface">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">IP Address:</span>
+                            <span class="value" id="ipAddress">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Packets:</span>
+                            <span class="value" id="packetCount">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Metrics -->
+            <div class="metrics-container">
+                <!-- Process List -->
+                <div class="metrics-section processes">
+                    <h3>Running Processes</h3>
+                    <div class="process-controls">
+                        <input type="text" placeholder="Search processes..." id="processSearch">
+                        <select id="processSort">
+                            <option value="cpu">Sort by CPU</option>
+                            <option value="memory">Sort by Memory</option>
+                            <option value="name">Sort by Name</option>
+                        </select>
+                    </div>
+                    <table class="process-table">
+                        <thead>
+                            <tr>
+                                <th>PID</th>
+                                <th>Name</th>
+                                <th>CPU %</th>
+                                <th>Memory</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="processList">
+                            <!-- Processes will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="metrics-section performance">
+                    <h3>Performance Metrics</h3>
+                    <div class="metrics-grid">
+                        <!-- CPU Core Usage -->
+                        <div class="metric-card">
+                            <h4>CPU Core Usage</h4>
+                            <div class="core-usage-grid" id="coreUsageGrid">
+                                <!-- Core usage bars will be dynamically added -->
+                            </div>
+                        </div>
+
+                        <!-- Memory Breakdown -->
+                        <div class="metric-card">
+                            <h4>Memory Breakdown</h4>
+                            <canvas id="memoryBreakdownChart"></canvas>
+                        </div>
+
+                        <!-- Disk I/O -->
+                        <div class="metric-card">
+                            <h4>Disk I/O</h4>
+                            <canvas id="diskIOChart"></canvas>
+                        </div>
+
+                        <!-- Network Traffic -->
+                        <div class="metric-card">
+                            <h4>Network Traffic</h4>
+                            <canvas id="networkTrafficChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Panel -->
+        <div class="bottom-panel">
+            <!-- System Events Log -->
+            <div class="events-log">
+                <div class="panel-header">
+                    <h3>System Events</h3>
+                    <div class="header-actions">
+                        <button class="clear-logs">Clear</button>
+                        <select class="event-level">
+                            <option value="all">All Events</option>
+                            <option value="warning">Warnings</option>
+                            <option value="error">Errors</option>
+                            <option value="info">Info</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="events-content">
+                    <!-- Events will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h2>Monitor Settings</h2>
+            <div class="settings-form">
+                <div class="form-group">
+                    <label>Update Interval</label>
+                    <select id="settingsInterval">
+                        <option value="1000">1 second</option>
+                        <option value="5000">5 seconds</option>
+                        <option value="10000">10 seconds</option>
+                        <option value="30000">30 seconds</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Graph History</label>
+                    <select id="settingsHistory">
+                        <option value="60">1 minute</option>
+                        <option value="300">5 minutes</option>
+                        <option value="600">10 minutes</option>
+                        <option value="1800">30 minutes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notifications</label>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="notifyCPU">
+                            CPU Usage Alerts
+                        </label>
+                        <label>
+                            <input type="checkbox" id="notifyMemory">
+                            Memory Usage Alerts
+                        </label>
+                        <label>
+                            <input type="checkbox" id="notifyDisk">
+                            Disk Space Alerts
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Alert Thresholds</label>
+                    <div class="threshold-inputs">
+                        <div class="threshold-input">
+                            <label>CPU</label>
+                            <input type="number" id="cpuThreshold" min="0" max="100" value="90">%
+                        </div>
+                        <div class="threshold-input">
+                            <label>Memory</label>
+                            <input type="number" id="memoryThreshold" min="0" max="100" value="90">%
+                        </div>
+                        <div class="threshold-input">
+                            <label>Disk</label>
+                            <input type="number" id="diskThreshold" min="0" max="100" value="90">%
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="secondary-button" data-action="cancel">Cancel</button>
+                <button class="primary-button" data-action="save">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../lib/chart.js/chart.min.js"></script>
+    <script src="../../js/tools/resource-monitor.js"></script>
+</body>
+</html> 
