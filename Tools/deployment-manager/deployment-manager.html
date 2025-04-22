@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment & Release Management Tool</title>
+    <link rel="stylesheet" href="../../css/tools/deployment-manager.css">
+</head>
+<body>
+    <div class="deployment-manager-layout">
+        <!-- Top Navigation Bar -->
+        <nav class="top-nav">
+            <div class="nav-left">
+                <button id="menuToggle" class="icon-button">☰</button>
+                <div class="project-selector">
+                    <select id="currentProject">
+                        <option value="">Select Project...</option>
+                    </select>
+                    <button id="newReleaseBtn" class="action-button">
+                        <span class="icon">🚀</span> New Release
+                    </button>
+                </div>
+            </div>
+            <div class="nav-center">
+                <div class="view-controls">
+                    <button class="view-button active" data-view="releases">
+                        <span class="icon">📦</span> Releases
+                    </button>
+                    <button class="view-button" data-view="environments">
+                        <span class="icon">🌍</span> Environments
+                    </button>
+                    <button class="view-button" data-view="pipelines">
+                        <span class="icon">⚡</span> Pipelines
+                    </button>
+                    <button class="view-button" data-view="history">
+                        <span class="icon">📅</span> History
+                    </button>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="environment-status">
+                    <div class="env-indicator production">
+                        <span class="env-name">PROD</span>
+                        <span class="env-health">Healthy</span>
+                    </div>
+                    <div class="env-indicator staging">
+                        <span class="env-name">STAGING</span>
+                        <span class="env-health">Healthy</span>
+                    </div>
+                    <div class="env-indicator development">
+                        <span class="env-name">DEV</span>
+                        <span class="env-health">Healthy</span>
+                    </div>
+                </div>
+                <button id="settingsBtn" class="icon-button">⚙️</button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div class="main-container">
+            <!-- Left Sidebar - Release Navigation -->
+            <aside class="sidebar left-sidebar">
+                <!-- Release Overview -->
+                <div class="sidebar-section release-overview">
+                    <h3>Release Overview</h3>
+                    <div class="release-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Active Releases</span>
+                            <span class="stat-value">3</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Pending Deployments</span>
+                            <span class="stat-value warning">2</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Success Rate</span>
+                            <span class="stat-value success">95%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Environment Health -->
+                <div class="sidebar-section environment-health">
+                    <h3>Environment Health</h3>
+                    <div class="health-metrics">
+                        <div class="env-health-card production">
+                            <div class="env-header">
+                                <h4>Production</h4>
+                                <span class="status healthy">Healthy</span>
+                            </div>
+                            <div class="metrics">
+                                <div class="metric">
+                                    <span class="label">CPU</span>
+                                    <div class="progress-bar">
+                                        <div class="progress" style="width: 65%"></div>
+                                    </div>
+                                    <span class="value">65%</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="label">Memory</span>
+                                    <div class="progress-bar">
+                                        <div class="progress" style="width: 78%"></div>
+                                    </div>
+                                    <span class="value">78%</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="label">Storage</span>
+                                    <div class="progress-bar">
+                                        <div class="progress" style="width: 45%"></div>
+                                    </div>
+                                    <span class="value">45%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- More environment health cards... -->
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="sidebar-section quick-actions">
+                    <h3>Quick Actions</h3>
+                    <div class="action-buttons">
+                        <button class="action-btn">
+                            <span class="icon">🔄</span>
+                            Restart Services
+                        </button>
+                        <button class="action-btn">
+                            <span class="icon">⏪</span>
+                            Rollback
+                        </button>
+                        <button class="action-btn">
+                            <span class="icon">🔍</span>
+                            Health Check
+                        </button>
+                        <button class="action-btn">
+                            <span class="icon">📊</span>
+                            View Logs
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Release Area -->
+            <main class="release-container">
+                <!-- Release List Header -->
+                <div class="list-header">
+                    <div class="header-left">
+                        <h2>Active Releases</h2>
+                        <div class="release-filters">
+                            <select class="status-filter">
+                                <option value="all">All Status</option>
+                                <option value="planned">Planned</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                            <select class="environment-filter">
+                                <option value="all">All Environments</option>
+                                <option value="production">Production</option>
+                                <option value="staging">Staging</option>
+                                <option value="development">Development</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <button class="refresh-btn">
+                            <span class="icon">🔄</span> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Release List -->
+                <div class="release-list">
+                    <!-- Release Card -->
+                    <div class="release-card">
+                        <div class="release-header">
+                            <div class="release-info">
+                                <h3>Release v2.1.0</h3>
+                                <span class="release-id">#REL-001</span>
+                            </div>
+                            <span class="status in-progress">In Progress</span>
+                        </div>
+                        <div class="release-content">
+                            <div class="deployment-progress">
+                                <div class="stage completed">
+                                    <span class="stage-name">Development</span>
+                                    <span class="stage-time">Completed 2h ago</span>
+                                </div>
+                                <div class="stage active">
+                                    <span class="stage-name">Staging</span>
+                                    <span class="stage-time">In Progress</span>
+                                </div>
+                                <div class="stage pending">
+                                    <span class="stage-name">Production</span>
+                                    <span class="stage-time">Pending</span>
+                                </div>
+                            </div>
+                            <div class="release-details">
+                                <div class="detail-item">
+                                    <span class="label">Owner</span>
+                                    <span class="value">John Doe</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="label">Start Time</span>
+                                    <span class="value">2024-02-15 10:30 AM</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="label">Duration</span>
+                                    <span class="value">2h 15m</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="release-actions">
+                            <button class="action-btn">View Details</button>
+                            <button class="action-btn">Deploy Next</button>
+                            <button class="action-btn">Rollback</button>
+                        </div>
+                    </div>
+                    <!-- More release cards... -->
+                </div>
+            </main>
+
+            <!-- Right Sidebar - Release Details -->
+            <aside class="sidebar right-sidebar">
+                <!-- Release Details -->
+                <div class="sidebar-section release-details">
+                    <div class="details-header">
+                        <span class="release-version">v2.1.0</span>
+                        <h3>Feature Release</h3>
+                        <div class="release-status">
+                            <span class="status-badge in-progress">In Progress</span>
+                        </div>
+                    </div>
+                    <div class="details-content">
+                        <div class="info-group">
+                            <label>Release Type</label>
+                            <span class="badge feature">Feature</span>
+                        </div>
+                        <div class="info-group">
+                            <label>Owner</label>
+                            <div class="user-info">
+                                <img src="avatar1.jpg" alt="John Doe">
+                                <span>John Doe</span>
+                            </div>
+                        </div>
+                        <div class="info-group">
+                            <label>Schedule</label>
+                            <div class="schedule-info">
+                                <div class="start-time">
+                                    <span class="label">Start:</span>
+                                    <span class="value">2024-02-15 10:30 AM</span>
+                                </div>
+                                <div class="end-time">
+                                    <span class="label">End:</span>
+                                    <span class="value">2024-02-15 02:30 PM</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deployment Steps -->
+                <div class="sidebar-section deployment-steps">
+                    <h3>Deployment Steps</h3>
+                    <div class="steps-list">
+                        <div class="step-item completed">
+                            <div class="step-header">
+                                <span class="step-number">1</span>
+                                <span class="step-title">Build Application</span>
+                                <span class="step-duration">2m 30s</span>
+                            </div>
+                            <div class="step-content">
+                                <div class="step-details">
+                                    Build successful. Artifacts generated.
+                                </div>
+                                <div class="step-logs">
+                                    <button class="view-logs-btn">View Logs</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- More deployment steps... -->
+                    </div>
+                </div>
+
+                <!-- Change Log -->
+                <div class="sidebar-section change-log">
+                    <h3>Change Log</h3>
+                    <div class="changes-list">
+                        <div class="change-item">
+                            <div class="change-header">
+                                <span class="commit-hash">#a1b2c3d</span>
+                                <span class="commit-date">2h ago</span>
+                            </div>
+                            <div class="change-content">
+                                <span class="author">Jane Smith</span>
+                                <span class="message">Added new feature XYZ</span>
+                            </div>
+                        </div>
+                        <!-- More change items... -->
+                    </div>
+                </div>
+
+                <!-- Deployment Metrics -->
+                <div class="sidebar-section deployment-metrics">
+                    <h3>Deployment Metrics</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <span class="metric-label">Build Time</span>
+                            <span class="metric-value">2m 30s</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Deploy Time</span>
+                            <span class="metric-value">5m 45s</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Success Rate</span>
+                            <span class="metric-value">100%</span>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Rollbacks</span>
+                            <span class="metric-value">0</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- New Release Modal -->
+    <div id="newReleaseModal" class="modal">
+        <div class="modal-content">
+            <h2>Create New Release</h2>
+            <form class="release-form">
+                <div class="form-group">
+                    <label>Version</label>
+                    <input type="text" id="releaseVersion" placeholder="e.g., 2.1.0" required>
+                </div>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="releaseName" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="releaseType">
+                            <option value="feature">Feature</option>
+                            <option value="bugfix">Bugfix</option>
+                            <option value="hotfix">Hotfix</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Target Environment</label>
+                        <select id="targetEnvironment">
+                            <option value="development">Development</option>
+                            <option value="staging">Staging</option>
+                            <option value="production">Production</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="releaseDescription"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Schedule</label>
+                    <div class="schedule-inputs">
+                        <div class="datetime-input">
+                            <label>Start</label>
+                            <input type="datetime-local" id="releaseStart">
+                        </div>
+                        <div class="datetime-input">
+                            <label>End</label>
+                            <input type="datetime-local" id="releaseEnd">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Change Sets</label>
+                    <div class="changeset-selector">
+                        <!-- Change sets will be populated dynamically -->
+                    </div>
+                </div>
+            </form>
+            <div class="modal-actions">
+                <button class="secondary-button" data-action="cancel">Cancel</button>
+                <button class="primary-button" data-action="create">Create Release</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deployment Confirmation Modal -->
+    <div id="deploymentConfirmModal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Deployment</h2>
+            <div class="deployment-summary">
+                <div class="summary-item">
+                    <label>Release</label>
+                    <span>v2.1.0 - Feature Release</span>
+                </div>
+                <div class="summary-item">
+                    <label>Environment</label>
+                    <span>Production</span>
+                </div>
+                <div class="summary-item">
+                    <label>Changes</label>
+                    <ul class="changes-list">
+                        <!-- Changes will be populated dynamically -->
+                    </ul>
+                </div>
+                <div class="summary-item">
+                    <label>Deployment Steps</label>
+                    <ol class="steps-list">
+                        <!-- Steps will be populated dynamically -->
+                    </ol>
+                </div>
+                <div class="confirmation-checkbox">
+                    <label>
+                        <input type="checkbox" required>
+                        I confirm that all pre-deployment checks have been completed
+                    </label>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="secondary-button" data-action="cancel">Cancel</button>
+                <button class="primary-button" data-action="deploy">Deploy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../../js/tools/deployment-manager.js"></script>
+</body>
+</html> 
